@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardDriverRouteImport } from './routes/_authenticated/dashboard.driver'
 import { Route as AuthenticatedDashboardCompanyRouteImport } from './routes/_authenticated/dashboard.company'
+import { Route as AuthenticatedDashboardDriverOnboardingRouteImport } from './routes/_authenticated/dashboard.driver.onboarding'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -47,20 +48,28 @@ const AuthenticatedDashboardCompanyRoute =
     path: '/dashboard/company',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardDriverOnboardingRoute =
+  AuthenticatedDashboardDriverOnboardingRouteImport.update({
+    id: '/onboarding',
+    path: '/onboarding',
+    getParentRoute: () => AuthenticatedDashboardDriverRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard/company': typeof AuthenticatedDashboardCompanyRoute
-  '/dashboard/driver': typeof AuthenticatedDashboardDriverRoute
+  '/dashboard/driver': typeof AuthenticatedDashboardDriverRouteWithChildren
+  '/dashboard/driver/onboarding': typeof AuthenticatedDashboardDriverOnboardingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard/company': typeof AuthenticatedDashboardCompanyRoute
-  '/dashboard/driver': typeof AuthenticatedDashboardDriverRoute
+  '/dashboard/driver': typeof AuthenticatedDashboardDriverRouteWithChildren
+  '/dashboard/driver/onboarding': typeof AuthenticatedDashboardDriverOnboardingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,7 +78,8 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_authenticated/dashboard/company': typeof AuthenticatedDashboardCompanyRoute
-  '/_authenticated/dashboard/driver': typeof AuthenticatedDashboardDriverRoute
+  '/_authenticated/dashboard/driver': typeof AuthenticatedDashboardDriverRouteWithChildren
+  '/_authenticated/dashboard/driver/onboarding': typeof AuthenticatedDashboardDriverOnboardingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -79,8 +89,15 @@ export interface FileRouteTypes {
     | '/signup'
     | '/dashboard/company'
     | '/dashboard/driver'
+    | '/dashboard/driver/onboarding'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/dashboard/company' | '/dashboard/driver'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/dashboard/company'
+    | '/dashboard/driver'
+    | '/dashboard/driver/onboarding'
   id:
     | '__root__'
     | '/'
@@ -89,6 +106,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_authenticated/dashboard/company'
     | '/_authenticated/dashboard/driver'
+    | '/_authenticated/dashboard/driver/onboarding'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -142,17 +160,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCompanyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/driver/onboarding': {
+      id: '/_authenticated/dashboard/driver/onboarding'
+      path: '/onboarding'
+      fullPath: '/dashboard/driver/onboarding'
+      preLoaderRoute: typeof AuthenticatedDashboardDriverOnboardingRouteImport
+      parentRoute: typeof AuthenticatedDashboardDriverRoute
+    }
   }
 }
 
+interface AuthenticatedDashboardDriverRouteChildren {
+  AuthenticatedDashboardDriverOnboardingRoute: typeof AuthenticatedDashboardDriverOnboardingRoute
+}
+
+const AuthenticatedDashboardDriverRouteChildren: AuthenticatedDashboardDriverRouteChildren =
+  {
+    AuthenticatedDashboardDriverOnboardingRoute:
+      AuthenticatedDashboardDriverOnboardingRoute,
+  }
+
+const AuthenticatedDashboardDriverRouteWithChildren =
+  AuthenticatedDashboardDriverRoute._addFileChildren(
+    AuthenticatedDashboardDriverRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardCompanyRoute: typeof AuthenticatedDashboardCompanyRoute
-  AuthenticatedDashboardDriverRoute: typeof AuthenticatedDashboardDriverRoute
+  AuthenticatedDashboardDriverRoute: typeof AuthenticatedDashboardDriverRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardCompanyRoute: AuthenticatedDashboardCompanyRoute,
-  AuthenticatedDashboardDriverRoute: AuthenticatedDashboardDriverRoute,
+  AuthenticatedDashboardDriverRoute:
+    AuthenticatedDashboardDriverRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
