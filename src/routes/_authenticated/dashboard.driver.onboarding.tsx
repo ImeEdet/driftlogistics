@@ -126,7 +126,7 @@ function OnboardingPage() {
       status: status === "not_started" ? "in_progress" : status,
       ...patch,
     };
-    const { error } = await supabase.from("driver_profiles").upsert(payload);
+    const { error } = await supabase.from("driver_profiles").upsert(payload as never);
     setSaving(false);
     if (error) toast.error(error.message);
     return !error;
