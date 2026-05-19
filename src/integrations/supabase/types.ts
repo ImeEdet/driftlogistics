@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      driver_profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          insurance_path: string | null
+          license_back_path: string | null
+          license_expiry: string | null
+          license_front_path: string | null
+          license_number: string | null
+          phone: string | null
+          preferred_areas: string[]
+          profile_photo_path: string | null
+          status: Database["public"]["Enums"]["onboarding_status"]
+          submitted_at: string | null
+          updated_at: string
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_plate: string | null
+          vehicle_registration_path: string | null
+          vehicle_type: Database["public"]["Enums"]["vehicle_type"] | null
+          vehicle_year: number | null
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          insurance_path?: string | null
+          license_back_path?: string | null
+          license_expiry?: string | null
+          license_front_path?: string | null
+          license_number?: string | null
+          phone?: string | null
+          preferred_areas?: string[]
+          profile_photo_path?: string | null
+          status?: Database["public"]["Enums"]["onboarding_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_plate?: string | null
+          vehicle_registration_path?: string | null
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"] | null
+          vehicle_year?: number | null
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          insurance_path?: string | null
+          license_back_path?: string | null
+          license_expiry?: string | null
+          license_front_path?: string | null
+          license_number?: string | null
+          phone?: string | null
+          preferred_areas?: string[]
+          profile_photo_path?: string | null
+          status?: Database["public"]["Enums"]["onboarding_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_plate?: string | null
+          vehicle_registration_path?: string | null
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"] | null
+          vehicle_year?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -43,7 +112,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      onboarding_status:
+        | "not_started"
+        | "in_progress"
+        | "submitted"
+        | "approved"
+        | "rejected"
       user_role: "company" | "driver"
+      vehicle_type: "bike" | "scooter" | "car" | "van" | "truck"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -171,7 +247,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      onboarding_status: [
+        "not_started",
+        "in_progress",
+        "submitted",
+        "approved",
+        "rejected",
+      ],
       user_role: ["company", "driver"],
+      vehicle_type: ["bike", "scooter", "car", "van", "truck"],
     },
   },
 } as const
