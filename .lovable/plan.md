@@ -1,53 +1,60 @@
-# Drift X — Landing + Auth Scaffold
+# Gate Dispatch on Approval + First Delivery CTA
 
-Building the Drift X marketing site with the "Tactical Radar" direction, plus a Lovable Cloud auth scaffold that supports both Companies and Drivers.
+## What you'll see
 
-## Scope of this build
+- The Fleet Console's "Dispatch Engine" tile becomes a real, clickable entry point — but only after your company is **approved**. Before that, it shows a clear locked state explaining what's needed.
+- A new **Dispatch** page at `/dashboard/company/dispatch` listing delivery requests (empty at first), with a prominent **"Create your first delivery request"** CTA.
+- A guided **New Delivery Request** form covering pickup, dropoff, package details, and scheduling.
+- Submitted requests show in the dispatch list with status (pending / assigned / in_transit / delivered / cancelled). Driver assignment isn't part of this turn — that's the next milestone.
 
-1. **Landing page** at `/` — full Tactical Radar composition (hero with live radar, dual-audience split, 5-pillar feature grid, vision band, footer).
-2. **Auth pages** powered by Lovable Cloud:
-   - `/signup` — single form with a role toggle (Company / Driver), email + password.
-   - `/login` — email + password.
-   - On signup, a profile row is created with the chosen role.
-3. **Placeholder dashboards** (gated behind auth):
-   - `/dashboard/company` — "coming soon" placeholder, themed.
-   - `/dashboard/driver` — "coming soon" placeholder, themed.
-   - After login, user is routed to the dashboard matching their role.
+## States on the Fleet Console
 
-Anything beyond this (job dispatching, wallet, admin panel, Google Maps integration, real-time tracking) is out of scope for this turn and will be built in follow-up steps.
-
-## Pages & routes
+The Dispatch tile reflects the company's verification status:
 
 ```text
-/                       Landing (Tactical Radar)
-/login                  Email + password login
-/signup                 Email + password + role pick
-/dashboard/company      Protected, role = company
-/dashboard/driver       Protected, role = driver
+not_started / in_progress  -> "Complete onboarding to unlock dispatch"
+submitted                  -> "Dispatch unlocks once your business is approved"
+rejected                   -> "Onboarding rejected — update & resubmit"
+approved                   -> "Open Dispatch -> "  (active link)
 ```
 
-Nav and hero CTAs route as follows:
-- "Recruit Drivers" / "For Companies" panel → `/signup?role=company`
-- "Apply to Drive" / "For Drivers" panel → `/signup?role=driver`
-- "Login" nav → `/login`
-- "Sign Up" nav → `/signup`
+Direct visits to `/dashboard/company/dispatch` and `/dashboard/company/dispatch/new` while not approved redirect back to the console with a toast.
 
-## Design system
+## Delivery request form
 
-Locked from the chosen direction — copied verbatim into `src/styles.css`:
-- Background `#050505`, foreground `#ffffff`, muted `#a1a1aa`, accent `#3b82f6`, border `rgba(255,255,255,0.08)`
-- Fonts: Inter Tight (display), Inter (body), JetBrains Mono (mono labels)
-- Motion: `reveal`, `pulse-dot` keyframes; radar visual in hero
+Fields, grouped:
 
-Dark theme is the only theme.
+- **Pickup**: contact name, phone, address, scheduled pickup time, notes
+- **Dropoff**: contact name, phone, address, notes
+- **Package**: type (document / parcel / food / fragile / other), weight (kg), size (S/M/L/XL), declared value (optional)
+- **Priority**: standard / express
+- Auto: `company_id = auth.uid()`, `status = 'pending'`, `created_at`
 
 ## Technical details
 
-- **Backend:** Lovable Cloud is enabled for auth. A `profiles` table stores `id` (FK to `auth.users`), `role` (`company` | `driver`), `created_at`. RLS: users can read/update only their own profile. A trigger creates the profile on signup using `role` from `raw_user_meta_data`.
-- **Auth flow:** `supabase.auth.signUp({ email, password, options: { data: { role }, emailRedirectTo: window.location.origin } })`. Session listener set up before `getSession()`. Auth state lives in router context so route guards can read it.
-- **Route guards:** TanStack pathless layout `src/routes/_authenticated.tsx` redirects unauthenticated users to `/login`. Dashboards live under `_authenticated/` and render role-specific content based on the profile row.
-- **Files added:** route files for index, login, signup, `_authenticated`, two dashboards; `src/integrations/supabase/client.ts` (already provided by Cloud); a shared `Nav` and `Footer` component; one Supabase migration for the `profiles` table + trigger.
+**Migration** — adds two enums and one table:
 
-## Out of scope (future turns)
+- `delivery_status` enum: `pending`, `assigned`, `in_transit`, `delivered`, `cancelled`
+- `package_type` enum: `document`, `parcel`, `food`, `fragile`, `other`
+- `public.delivery_requests` table with: pickup/dropoff contact + address + notes, scheduled_pickup_at, package_type, weight_kg, size, declared_value, priority, status, company_id (FK auth.users), created_at, updated_at
+- GRANTs to `authenticated` and `service_role`; RLS so a company only sees/creates/edits its own requests (`auth.uid() = company_id`)
+- Insert is additionally guarded by a check that the company's `company_profiles.status = 'approved'` (defense in depth alongside UI gating)
+- `touch_updated_at` trigger
 
-Job dispatching engine, driver onboarding/document upload, wallet & payouts, admin control center, company fleet integration, Google Maps live tracking, push/SMS alerts.
+**Routes** (TanStack file-based):
+
+- `src/routes/_authenticated/dashboard.company.dispatch.tsx` — list + empty state with the "Create your first delivery request" CTA
+- `src/routes/_authenticated/dashboard.company.dispatch.new.tsx` — multi-section form
+
+Both routes call `supabase.auth.getUser()` + read `company_profiles.status`; if not `approved`, redirect to `/dashboard/company` with a toast.
+
+**Console update** — `dashboard.company.tsx` reads `status` (already wired), and the existing "Dispatch Engine" tile becomes status-aware: locked label when not approved, active `<Link to="/dashboard/company/dispatch">` when approved.
+
+**Out of scope this turn**: driver assignment, live map tracking, pricing/quotes, notifications, edit/cancel actions on existing requests (status will be read-only `pending`).
+
+## Files
+
+- `supabase/migrations/<ts>_delivery_requests.sql` (new)
+- `src/routes/_authenticated/dashboard.company.tsx` (edit — make Dispatch tile status-aware)
+- `src/routes/_authenticated/dashboard.company.dispatch.tsx` (new)
+- `src/routes/_authenticated/dashboard.company.dispatch.new.tsx` (new)
