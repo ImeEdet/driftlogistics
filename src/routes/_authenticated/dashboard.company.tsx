@@ -68,17 +68,51 @@ function CompanyDashboard() {
       )}
 
       <div className="grid md:grid-cols-3 gap-px bg-border border border-border">
-        {[
-          { t: "Driver Network", d: "Browse and onboard verified drivers." },
-          { t: "Dispatch Engine", d: "Assign loads with AI-optimized routing." },
-          { t: "Live Tracking", d: "Real-time fleet visibility on a single map." },
-        ].map((m) => (
-          <div key={m.t} className="bg-background p-8">
-            <div className="text-[10px] font-mono text-accent uppercase tracking-widest mb-3">// Coming Soon</div>
-            <h3 className="font-display font-bold text-lg mb-2">{m.t}</h3>
-            <p className="text-sm text-muted-foreground">{m.d}</p>
+        <div className="bg-background p-8">
+          <div className="text-[10px] font-mono text-accent uppercase tracking-widest mb-3">// Coming Soon</div>
+          <h3 className="font-display font-bold text-lg mb-2">Driver Network</h3>
+          <p className="text-sm text-muted-foreground">Browse and onboard verified drivers.</p>
+        </div>
+
+        {status === "approved" ? (
+          <Link
+            to="/dashboard/company/dispatch"
+            className="bg-background p-8 hover:bg-accent/5 transition-colors group block"
+          >
+            <div className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest mb-3">
+              // Active
+            </div>
+            <h3 className="font-display font-bold text-lg mb-2 group-hover:text-accent transition-colors">
+              Dispatch Engine →
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Create delivery requests and assign loads with AI-optimized routing.
+            </p>
+          </Link>
+        ) : (
+          <div className="bg-background p-8 relative">
+            <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
+              <span aria-hidden>◇</span>
+              {status === "submitted" ? "// Locked — Awaiting Approval" : "// Locked"}
+            </div>
+            <h3 className="font-display font-bold text-lg mb-2 text-muted-foreground">
+              Dispatch Engine
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {status === "submitted"
+                ? "Dispatch unlocks once your business is approved."
+                : status === "rejected"
+                  ? "Onboarding rejected — update and resubmit to unlock dispatch."
+                  : "Complete onboarding to unlock dispatch."}
+            </p>
           </div>
-        ))}
+        )}
+
+        <div className="bg-background p-8">
+          <div className="text-[10px] font-mono text-accent uppercase tracking-widest mb-3">// Coming Soon</div>
+          <h3 className="font-display font-bold text-lg mb-2">Live Tracking</h3>
+          <p className="text-sm text-muted-foreground">Real-time fleet visibility on a single map.</p>
+        </div>
       </div>
     </DashboardShell>
   );
