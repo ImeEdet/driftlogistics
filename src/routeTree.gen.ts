@@ -17,6 +17,8 @@ import { Route as AuthenticatedDashboardDriverRouteImport } from './routes/_auth
 import { Route as AuthenticatedDashboardCompanyRouteImport } from './routes/_authenticated/dashboard.company'
 import { Route as AuthenticatedDashboardDriverOnboardingRouteImport } from './routes/_authenticated/dashboard.driver.onboarding'
 import { Route as AuthenticatedDashboardCompanyOnboardingRouteImport } from './routes/_authenticated/dashboard.company.onboarding'
+import { Route as AuthenticatedDashboardCompanyDispatchRouteImport } from './routes/_authenticated/dashboard.company.dispatch'
+import { Route as AuthenticatedDashboardCompanyDispatchNewRouteImport } from './routes/_authenticated/dashboard.company.dispatch.new'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -61,6 +63,18 @@ const AuthenticatedDashboardCompanyOnboardingRoute =
     path: '/onboarding',
     getParentRoute: () => AuthenticatedDashboardCompanyRoute,
   } as any)
+const AuthenticatedDashboardCompanyDispatchRoute =
+  AuthenticatedDashboardCompanyDispatchRouteImport.update({
+    id: '/dispatch',
+    path: '/dispatch',
+    getParentRoute: () => AuthenticatedDashboardCompanyRoute,
+  } as any)
+const AuthenticatedDashboardCompanyDispatchNewRoute =
+  AuthenticatedDashboardCompanyDispatchNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedDashboardCompanyDispatchRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,8 +82,10 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/dashboard/company': typeof AuthenticatedDashboardCompanyRouteWithChildren
   '/dashboard/driver': typeof AuthenticatedDashboardDriverRouteWithChildren
+  '/dashboard/company/dispatch': typeof AuthenticatedDashboardCompanyDispatchRouteWithChildren
   '/dashboard/company/onboarding': typeof AuthenticatedDashboardCompanyOnboardingRoute
   '/dashboard/driver/onboarding': typeof AuthenticatedDashboardDriverOnboardingRoute
+  '/dashboard/company/dispatch/new': typeof AuthenticatedDashboardCompanyDispatchNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,8 +93,10 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/dashboard/company': typeof AuthenticatedDashboardCompanyRouteWithChildren
   '/dashboard/driver': typeof AuthenticatedDashboardDriverRouteWithChildren
+  '/dashboard/company/dispatch': typeof AuthenticatedDashboardCompanyDispatchRouteWithChildren
   '/dashboard/company/onboarding': typeof AuthenticatedDashboardCompanyOnboardingRoute
   '/dashboard/driver/onboarding': typeof AuthenticatedDashboardDriverOnboardingRoute
+  '/dashboard/company/dispatch/new': typeof AuthenticatedDashboardCompanyDispatchNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,8 +106,10 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_authenticated/dashboard/company': typeof AuthenticatedDashboardCompanyRouteWithChildren
   '/_authenticated/dashboard/driver': typeof AuthenticatedDashboardDriverRouteWithChildren
+  '/_authenticated/dashboard/company/dispatch': typeof AuthenticatedDashboardCompanyDispatchRouteWithChildren
   '/_authenticated/dashboard/company/onboarding': typeof AuthenticatedDashboardCompanyOnboardingRoute
   '/_authenticated/dashboard/driver/onboarding': typeof AuthenticatedDashboardDriverOnboardingRoute
+  '/_authenticated/dashboard/company/dispatch/new': typeof AuthenticatedDashboardCompanyDispatchNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -99,8 +119,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/dashboard/company'
     | '/dashboard/driver'
+    | '/dashboard/company/dispatch'
     | '/dashboard/company/onboarding'
     | '/dashboard/driver/onboarding'
+    | '/dashboard/company/dispatch/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -108,8 +130,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/dashboard/company'
     | '/dashboard/driver'
+    | '/dashboard/company/dispatch'
     | '/dashboard/company/onboarding'
     | '/dashboard/driver/onboarding'
+    | '/dashboard/company/dispatch/new'
   id:
     | '__root__'
     | '/'
@@ -118,8 +142,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_authenticated/dashboard/company'
     | '/_authenticated/dashboard/driver'
+    | '/_authenticated/dashboard/company/dispatch'
     | '/_authenticated/dashboard/company/onboarding'
     | '/_authenticated/dashboard/driver/onboarding'
+    | '/_authenticated/dashboard/company/dispatch/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -187,15 +213,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCompanyOnboardingRouteImport
       parentRoute: typeof AuthenticatedDashboardCompanyRoute
     }
+    '/_authenticated/dashboard/company/dispatch': {
+      id: '/_authenticated/dashboard/company/dispatch'
+      path: '/dispatch'
+      fullPath: '/dashboard/company/dispatch'
+      preLoaderRoute: typeof AuthenticatedDashboardCompanyDispatchRouteImport
+      parentRoute: typeof AuthenticatedDashboardCompanyRoute
+    }
+    '/_authenticated/dashboard/company/dispatch/new': {
+      id: '/_authenticated/dashboard/company/dispatch/new'
+      path: '/new'
+      fullPath: '/dashboard/company/dispatch/new'
+      preLoaderRoute: typeof AuthenticatedDashboardCompanyDispatchNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardCompanyDispatchRoute
+    }
   }
 }
 
+interface AuthenticatedDashboardCompanyDispatchRouteChildren {
+  AuthenticatedDashboardCompanyDispatchNewRoute: typeof AuthenticatedDashboardCompanyDispatchNewRoute
+}
+
+const AuthenticatedDashboardCompanyDispatchRouteChildren: AuthenticatedDashboardCompanyDispatchRouteChildren =
+  {
+    AuthenticatedDashboardCompanyDispatchNewRoute:
+      AuthenticatedDashboardCompanyDispatchNewRoute,
+  }
+
+const AuthenticatedDashboardCompanyDispatchRouteWithChildren =
+  AuthenticatedDashboardCompanyDispatchRoute._addFileChildren(
+    AuthenticatedDashboardCompanyDispatchRouteChildren,
+  )
+
 interface AuthenticatedDashboardCompanyRouteChildren {
+  AuthenticatedDashboardCompanyDispatchRoute: typeof AuthenticatedDashboardCompanyDispatchRouteWithChildren
   AuthenticatedDashboardCompanyOnboardingRoute: typeof AuthenticatedDashboardCompanyOnboardingRoute
 }
 
 const AuthenticatedDashboardCompanyRouteChildren: AuthenticatedDashboardCompanyRouteChildren =
   {
+    AuthenticatedDashboardCompanyDispatchRoute:
+      AuthenticatedDashboardCompanyDispatchRouteWithChildren,
     AuthenticatedDashboardCompanyOnboardingRoute:
       AuthenticatedDashboardCompanyOnboardingRoute,
   }
