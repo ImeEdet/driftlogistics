@@ -17,6 +17,7 @@ import { Route as AuthenticatedDashboardDriverRouteImport } from './routes/_auth
 import { Route as AuthenticatedDashboardCompanyRouteImport } from './routes/_authenticated/dashboard.company'
 import { Route as AuthenticatedDashboardDriverOnboardingRouteImport } from './routes/_authenticated/dashboard.driver.onboarding'
 import { Route as AuthenticatedDashboardCompanyOnboardingRouteImport } from './routes/_authenticated/dashboard.company.onboarding'
+import { Route as AuthenticatedDashboardCompanyDispatchRouteImport } from './routes/_authenticated/dashboard.company.dispatch'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -61,6 +62,12 @@ const AuthenticatedDashboardCompanyOnboardingRoute =
     path: '/onboarding',
     getParentRoute: () => AuthenticatedDashboardCompanyRoute,
   } as any)
+const AuthenticatedDashboardCompanyDispatchRoute =
+  AuthenticatedDashboardCompanyDispatchRouteImport.update({
+    id: '/dispatch',
+    path: '/dispatch',
+    getParentRoute: () => AuthenticatedDashboardCompanyRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/dashboard/company': typeof AuthenticatedDashboardCompanyRouteWithChildren
   '/dashboard/driver': typeof AuthenticatedDashboardDriverRouteWithChildren
+  '/dashboard/company/dispatch': typeof AuthenticatedDashboardCompanyDispatchRoute
   '/dashboard/company/onboarding': typeof AuthenticatedDashboardCompanyOnboardingRoute
   '/dashboard/driver/onboarding': typeof AuthenticatedDashboardDriverOnboardingRoute
 }
@@ -77,6 +85,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/dashboard/company': typeof AuthenticatedDashboardCompanyRouteWithChildren
   '/dashboard/driver': typeof AuthenticatedDashboardDriverRouteWithChildren
+  '/dashboard/company/dispatch': typeof AuthenticatedDashboardCompanyDispatchRoute
   '/dashboard/company/onboarding': typeof AuthenticatedDashboardCompanyOnboardingRoute
   '/dashboard/driver/onboarding': typeof AuthenticatedDashboardDriverOnboardingRoute
 }
@@ -88,6 +97,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_authenticated/dashboard/company': typeof AuthenticatedDashboardCompanyRouteWithChildren
   '/_authenticated/dashboard/driver': typeof AuthenticatedDashboardDriverRouteWithChildren
+  '/_authenticated/dashboard/company/dispatch': typeof AuthenticatedDashboardCompanyDispatchRoute
   '/_authenticated/dashboard/company/onboarding': typeof AuthenticatedDashboardCompanyOnboardingRoute
   '/_authenticated/dashboard/driver/onboarding': typeof AuthenticatedDashboardDriverOnboardingRoute
 }
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/dashboard/company'
     | '/dashboard/driver'
+    | '/dashboard/company/dispatch'
     | '/dashboard/company/onboarding'
     | '/dashboard/driver/onboarding'
   fileRoutesByTo: FileRoutesByTo
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/dashboard/company'
     | '/dashboard/driver'
+    | '/dashboard/company/dispatch'
     | '/dashboard/company/onboarding'
     | '/dashboard/driver/onboarding'
   id:
@@ -118,6 +130,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_authenticated/dashboard/company'
     | '/_authenticated/dashboard/driver'
+    | '/_authenticated/dashboard/company/dispatch'
     | '/_authenticated/dashboard/company/onboarding'
     | '/_authenticated/dashboard/driver/onboarding'
   fileRoutesById: FileRoutesById
@@ -187,15 +200,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCompanyOnboardingRouteImport
       parentRoute: typeof AuthenticatedDashboardCompanyRoute
     }
+    '/_authenticated/dashboard/company/dispatch': {
+      id: '/_authenticated/dashboard/company/dispatch'
+      path: '/dispatch'
+      fullPath: '/dashboard/company/dispatch'
+      preLoaderRoute: typeof AuthenticatedDashboardCompanyDispatchRouteImport
+      parentRoute: typeof AuthenticatedDashboardCompanyRoute
+    }
   }
 }
 
 interface AuthenticatedDashboardCompanyRouteChildren {
+  AuthenticatedDashboardCompanyDispatchRoute: typeof AuthenticatedDashboardCompanyDispatchRoute
   AuthenticatedDashboardCompanyOnboardingRoute: typeof AuthenticatedDashboardCompanyOnboardingRoute
 }
 
 const AuthenticatedDashboardCompanyRouteChildren: AuthenticatedDashboardCompanyRouteChildren =
   {
+    AuthenticatedDashboardCompanyDispatchRoute:
+      AuthenticatedDashboardCompanyDispatchRoute,
     AuthenticatedDashboardCompanyOnboardingRoute:
       AuthenticatedDashboardCompanyOnboardingRoute,
   }
@@ -245,3 +268,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
